@@ -1,0 +1,7 @@
+.gc
+.hub
+.private
+boards.txt
+variants/nightlight/
+variants/teatimer/
+variants/watchdogformillis/
