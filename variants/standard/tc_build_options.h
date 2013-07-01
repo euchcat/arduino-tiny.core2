@@ -61,6 +61,13 @@
 
 
 /*=============================================================================
+  Which timer should be used for millis
+=============================================================================*/
+
+//#define TC_TIMER_TO_USE_FOR_MILLIS  1
+
+
+/*=============================================================================
   The standard behaviour is to turn of PWM in digitalWrite and digitalRead.
   For mosting applications, the standard behaviour is not relevant.  Turning 
   this option off reduces the image size.

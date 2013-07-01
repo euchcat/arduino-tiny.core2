@@ -18,11 +18,11 @@
 
 // fix or rmv #include <binary.h>
 
-#include <tc_select_build_options.h>
-// fix or rmv #include <tc_adc.h>
-#include <tc_macros.h>
-#include <tc_hardware_mapping.h>  // fix?  Header for each processor?
-#include <tc_timer_types.h>
+#include "tc_select_build_options.h"
+// fix or rmv #include "tc_adc.h"
+#include "tc_macros.h"
+#include "tc_hardware_mapping.h"  // fix?  Header for each processor?
+#include "tc_timer_types.h"
 // fix or rmv #include <core_timers.h>
 
 // fix or rmv #include <PwmTimer.h>
@@ -33,6 +33,15 @@
 #endif
 
 #include <Print.h>
+
+
+/*=============================================================================
+  Support for inline PROGMEM string constants
+=============================================================================*/
+
+class __FlashStringHelper;
+#define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
+
 
 #ifdef __cplusplus
 
@@ -368,10 +377,13 @@ public:
   __attribute__((always_inline)) static inline 
   void Initialize( void )
   {
+    CoreInitialize( true, tcMillisTimer_Prescale_Index, false );
+/* rmv
     CoreInitialize( 
         Fast_PWM_FF, 
         tcMillisTimer_Prescale_Index,
         true );
+*/
     tc_MillisViaTimer_ForceReference();
   }
 
@@ -410,10 +422,13 @@ public:
   {
     if ( TC_INITIALIZE_SECONDARY_TIMERS )
     {
+      CoreInitialize( false, TC_PASTE2(Prescale_Value_,TC_DEFAULT_TIMER_PRESCALE_VALUE), true );
+/* rmv
       CoreInitialize( 
           Phase_Correct_PWM_FF,
           TC_PASTE2(Prescale_Value_,TC_DEFAULT_TIMER_PRESCALE_VALUE),
           false );
+*/
     }
   }
 
@@ -443,8 +458,21 @@ class TC_PASTE2( tcTimer, TC_TIMER_TO_USE_FOR_TONE ): public tcToneTimer
 =============================================================================*/
 
 #if TC_TIMER_COUNT >= 1
-#if ! TC_TIMER_0
-#endif
+  #if ! TC_TIMER_0
+    class tcTimer0: public TC_PASTE2( tcTimerInterface, 0 )
+    {
+    public:
+      __attribute__((always_inline)) static inline 
+      void Initialize( void )
+      {
+        if ( TC_INITIALIZE_SECONDARY_TIMERS )
+        {
+          CoreInitialize( false, TC_PASTE2(Prescale_Value_,TC_DEFAULT_TIMER_PRESCALE_VALUE), true );
+        }
+      }
+    };
+    #define TC_TIMER_0  1
+  #endif
 #endif
 
 #if TC_TIMER_COUNT >= 2
@@ -457,10 +485,13 @@ class TC_PASTE2( tcTimer, TC_TIMER_TO_USE_FOR_TONE ): public tcToneTimer
       {
         if ( TC_INITIALIZE_SECONDARY_TIMERS )
         {
+          CoreInitialize( false, TC_PASTE2(Prescale_Value_,TC_DEFAULT_TIMER_PRESCALE_VALUE), true );
+/* rmv
           CoreInitialize( 
               Phase_Correct_PWM_FF,
               TC_PASTE2(Prescale_Value_,TC_DEFAULT_TIMER_PRESCALE_VALUE),
               false );
+*/
         }
       }
     };
@@ -1495,14 +1526,6 @@ void init( void );
 
 void setup( void );
 void loop( void );
-
-
-/*=============================================================================
-  Support for inline PROGMEM string constants
-=============================================================================*/
-
-class __FlashStringHelper;
-#define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
 
 
 #endif  // __cplusplus

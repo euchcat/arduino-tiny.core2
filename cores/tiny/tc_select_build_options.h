@@ -248,6 +248,40 @@
 #if TC_USE_TIMER_FOR_MILLIS
 
   #if TC_TIMER_COUNT >= 1
+
+    #if ! defined( TC_TIMER_TO_USE_FOR_MILLIS )
+      #define TC_TIMER_TO_USE_FOR_MILLIS  0
+    #endif
+
+    #if TC_TIMER_TO_USE_FOR_MILLIS > (TC_TIMER_COUNT - 1)
+      #error millis is assigned to a timer that does not exist.
+    #endif
+
+    #if TC_TIMER_COUNT == 2
+      #if TC_TIMER_TO_USE_FOR_MILLIS == 0
+        #define TC_TIMER_TO_USE_FOR_TONE  1
+      #elif TC_TIMER_TO_USE_FOR_MILLIS == 1
+        #define TC_TIMER_TO_USE_FOR_TONE  0
+      #endif
+    #elif TC_TIMER_COUNT > 2
+      #if TC_TIMER_TO_USE_FOR_MILLIS != (TC_TIMER_COUNT - 1)
+        #define TC_TIMER_TO_USE_FOR_TONE  (TC_TIMER_COUNT - 1)
+      #else 
+        #define TC_TIMER_TO_USE_FOR_TONE  (TC_TIMER_COUNT - 2)
+      #endif
+      #if (TC_TIMER_TO_USE_FOR_MILLIS != 1) && (TC_TIMER_TO_USE_FOR_TONE != 1)
+        #define TC_TIMER_TO_USE_FOR_USER  1
+      #elif (TC_TIMER_TO_USE_FOR_MILLIS != 0) && (TC_TIMER_TO_USE_FOR_TONE != 0)
+        #define TC_TIMER_TO_USE_FOR_USER  0
+      #elif (TC_TIMER_TO_USE_FOR_MILLIS != 2) && (TC_TIMER_TO_USE_FOR_TONE != 2)
+        #define TC_TIMER_TO_USE_FOR_USER  2
+      #endif
+    #endif
+
+  #endif
+
+/* rmv
+  #if TC_TIMER_COUNT >= 1
     #define TC_TIMER_TO_USE_FOR_MILLIS  0
   #endif
 
@@ -257,6 +291,7 @@
     #define TC_TIMER_TO_USE_FOR_USER  1
     #define TC_TIMER_TO_USE_FOR_TONE  2
   #endif
+*/
 
 #else // ! TC_USE_TIMER_FOR_MILLIS (implying TC_USE_WATCHDOG_FOR_MILLIS or no millis) 
 
@@ -268,6 +303,8 @@
   #endif
 
 #endif // TC_USE_TIMER_FOR_MILLIS
+
+#undef TC_TIMER_TO_USE_FOR_TONE
 
 
 /*=============================================================================

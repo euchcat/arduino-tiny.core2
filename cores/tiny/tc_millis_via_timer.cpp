@@ -32,6 +32,15 @@ typedef uint8_t tc_timer0_fract_t;
 
 #else
 
+/*
+#define MILLIS_INC (2)
+//#define FRACT_INC (1573)
+#define FRACT_INC (1943)
+#define FRACT_MAX (32768)
+
+typedef uint16_t tc_timer0_fract_t;
+*/
+
 /**
 #define MILLIS_INC (1)
 

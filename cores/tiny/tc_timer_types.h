@@ -458,7 +458,35 @@ public:
   }
 
   __attribute__((always_inline)) static inline 
-  void CoreInitialize( wgm_t wgm, cs_t cs, bool ei )
+  void CoreInitializeHelper( wgm_t wgm, cs_t cs )
+  {
+    *tc_timer_register_set_generic_8b[index].pTCCRA = (((wgm & 0b011) >> 0) << TC_WGM0_8B);
+    *tc_timer_register_set_generic_8b[index].pTCCRB = (((wgm & 0b100) >> 2) << TC_WGM2_8B) | (cs << TC_CS0_8B);
+  }
+
+  __attribute__((always_inline)) static inline 
+  void CoreInitialize( bool primary, cs_t cs, bool favorphasecorrect )
+  {
+    if ( primary )
+    {
+      CoreInitializeHelper( Fast_PWM_FF, cs );
+      *tc_timer_register_set_generic_8b[index].pTIMSK = (1 << TC_TOIE_8B);      
+    }
+    else
+    {
+      if ( favorphasecorrect )
+      {
+        CoreInitializeHelper( Phase_Correct_PWM_FF, cs );
+      }
+      else
+      {
+        CoreInitializeHelper( Fast_PWM_FF, cs );
+      }
+    }
+  }
+
+  __attribute__((always_inline)) static inline 
+  void CoreInitializeRmv( wgm_t wgm, cs_t cs, bool ei )
   {
     *tc_timer_register_set_generic_8b[index].pTCCRA = (((wgm & 0b011) >> 0) << TC_WGM0_8B);
 
@@ -681,7 +709,35 @@ public:
   }
 
   __attribute__((always_inline)) static inline 
-  void CoreInitialize( wgm_t wgm, cs_t cs, bool ei )
+  void CoreInitializeHelper( wgm_t wgm, cs_t cs )
+  {
+    *tc_timer_register_set_generic_16b[index].pTCCRA = (((wgm & 0b0011) >> 0) << TC_WGM0_16B);
+    *tc_timer_register_set_generic_16b[index].pTCCRB = (((wgm & 0b1100) >> 2) << TC_WGM2_16B) | (cs << TC_CS0_16B);
+  }
+
+  __attribute__((always_inline)) static inline 
+  void CoreInitialize( bool primary, cs_t cs, bool favorphasecorrect )
+  {
+    if ( primary )
+    {
+      CoreInitializeHelper( Fast_PWM_FF, cs );
+      *tc_timer_register_set_generic_16b[index].pTIMSK = (1 << TC_TOIE_16B);
+    }
+    else
+    {
+      if ( favorphasecorrect )
+      {
+        CoreInitializeHelper( Phase_Correct_PWM_FF, cs );
+      }
+      else
+      {
+        CoreInitializeHelper( Fast_PWM_FF, cs );
+      }
+    }
+  }
+
+  __attribute__((always_inline)) static inline 
+  void CoreInitializeRmv( wgm_t wgm, cs_t cs, bool ei )
   {
     *tc_timer_register_set_generic_16b[index].pTCCRA = (((wgm & 0b0011) >> 0) << TC_WGM0_16B);
 
